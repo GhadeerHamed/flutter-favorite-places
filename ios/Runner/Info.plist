@@ -50,6 +50,8 @@
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to let you take pictures for your favorite places</string>
 	<key>NSMicrophoneUsageDescription </key>
-	<string>We need access to your microphone to let you record audio for your favorite places</
+	<string>We need access to your microphone to let you record audio for your favorite places</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need access to your location to let you save the location of your favorite places</string>
 </dict>
 </plist>
