@@ -4,6 +4,7 @@ import 'package:favorite_places/models/place.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LocationInput extends StatefulWidget {
   const LocationInput({super.key});
@@ -15,6 +16,19 @@ class LocationInput extends StatefulWidget {
 class _LocationInputState extends State<LocationInput> {
   PlaceLocation? _pickedLocation;
   var _isGettingLocation = false;
+
+  String get apiKey => dotenv.get("GOOGLE_MAP_API_KEY");
+
+  String get locationImage {
+    if (_pickedLocation == null) {
+      return '';
+    }
+
+    final lat = _pickedLocation!.latitude;
+    final lng = _pickedLocation!.longitude;
+
+    return "https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&zoom=13&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C$lat,$lng&key=$apiKey";
+  }
 
   void _getCurrentLocation() async {
     Location location = Location();
@@ -55,18 +69,19 @@ class _LocationInputState extends State<LocationInput> {
     }
 
     final url = Uri.parse(
-      'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=${const String.fromEnvironment("GOOGLE_MAP_API_KEY")}',
+      'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$apiKey',
     );
 
     final response = await http.get(url);
     final data = json.decode(response.body);
+    print(data);
     final address = data['results'][0]['formatted_address'];
 
     setState(() {
       _isGettingLocation = false;
       _pickedLocation = PlaceLocation(
-        latitude: lat!,
-        longitude: lng!,
+        latitude: lat,
+        longitude: lng,
         address: address,
       );
     });
@@ -83,6 +98,15 @@ class _LocationInputState extends State<LocationInput> {
         ).colorScheme.onSurface.withValues(alpha: 0.5),
       ),
     );
+
+    if (_pickedLocation != null) {
+      previewContent = Image.network(
+        locationImage,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      );
+    }
 
     if (_isGettingLocation) {
       previewContent = const CircularProgressIndicator();
