@@ -7,7 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LocationInput extends StatefulWidget {
-  const LocationInput({super.key});
+  const LocationInput({super.key, required this.onSelectLocation});
+
+  final Function(PlaceLocation) onSelectLocation;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -74,7 +76,6 @@ class _LocationInputState extends State<LocationInput> {
 
     final response = await http.get(url);
     final data = json.decode(response.body);
-    print(data);
     final address = data['results'][0]['formatted_address'];
 
     setState(() {
@@ -85,6 +86,8 @@ class _LocationInputState extends State<LocationInput> {
         address: address,
       );
     });
+
+    widget.onSelectLocation(_pickedLocation!);
   }
 
   @override
